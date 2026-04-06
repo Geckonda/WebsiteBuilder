@@ -1,0 +1,70 @@
+{
+  "templates": [
+    {
+      "id": "1",
+      "name": "Business Landing",
+      "keywords": ["бизнес", "корпоративный", "услуги"],
+      "description": "Профессиональный шаблон для бизнес-сайтов. Подходит для компаний, предоставляющих услуги.",
+      "author": "DesignStudio",
+      "license": "MIT",
+      "price": 0,
+      "preview": "https://placehold.co/600x400/6366f1/ffffff?text=Business",
+      "blocks": [
+        { "id": "b1", "type": "text", "label": "Заголовок", "value": "" },
+        { "id": "b2", "type": "text", "label": "Описание компании", "value": "" },
+        { "id": "b3", "type": "image", "label": "Главный баннер", "value": "" },
+        { "id": "b4", "type": "text", "label": "Контакты", "value": "" }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Portfolio",
+      "keywords": ["портфолио", "дизайн", "фриланс"],
+      "description": "Минималистичный шаблон для портфолио дизайнеров и разработчиков.",
+      "author": "CreativeHub",
+      "license": "CC BY 4.0",
+      "price": 0,
+      "preview": "https://placehold.co/600x400/10b981/ffffff?text=Portfolio",
+      "blocks": [
+        { "id": "b1", "type": "text", "label": "Имя и должность", "value": "" },
+        { "id": "b2", "type": "image", "label": "Фото", "value": "" },
+        { "id": "b3", "type": "text", "label": "О себе", "value": "" },
+        { "id": "b4", "type": "image", "label": "Работы (галерея)", "value": "" }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Product Promo",
+      "keywords": ["продукт", "промо", "продажи", "e-commerce"],
+      "description": "Шаблон для продвижения конкретного продукта или товара.",
+      "author": "MarketPro",
+      "license": "Платная",
+      "price": 990,
+      "preview": "https://placehold.co/600x400/f59e0b/ffffff?text=Product",
+      "blocks": [
+        { "id": "b1", "type": "text", "label": "Название продукта", "value": "" },
+        { "id": "b2", "type": "image", "label": "Фото продукта", "value": "" },
+        { "id": "b3", "type": "text", "label": "Преимущества", "value": "" },
+        { "id": "b4", "type": "text", "label": "Цена и призыв к действию", "value": "" }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Event Page",
+      "keywords": ["мероприятие", "конференция", "событие"],
+      "description": "Шаблон для анонса мероприятий, конференций и вебинаров.",
+      "author": "EventMaster",
+      "license": "MIT",
+      "price": 0,
+      "preview": "https://placehold.co/600x400/ef4444/ffffff?text=Event",
+      "blocks": [
+        { "id": "b1", "type": "text", "label": "Название мероприятия", "value": "" },
+        { "id": "b2", "type": "text", "label": "Дата и место", "value": "" },
+        { "id": "b3", "type": "image", "label": "Баннер события", "value": "" },
+        { "id": "b4", "type": "text", "label": "Программа", "value": "" },
+        { "id": "b5", "type": "text", "label": "Регистрация", "value": "" }
+      ]
+    }
+  ],
+  "landings": []
+}
