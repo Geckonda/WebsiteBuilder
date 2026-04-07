@@ -69,25 +69,10 @@
 
         <div class="field">
           <label class="field__label">Ключевые слова</label>
-          <div class="tags-input">
-            <span
-              v-for="kw in form.keywords"
-              :key="kw"
-              class="tags-input__tag"
-            >
-              {{ kw }}
-              <button class="tags-input__remove" @click="removeKeyword(kw)">✕</button>
-            </span>
-            <input
-              v-model="keywordInput"
-              class="tags-input__input"
-              type="text"
-              placeholder="Введите и нажмите Enter..."
-              @keydown.enter.prevent="addKeyword"
-              @keydown.comma.prevent="addKeyword"
-            />
-          </div>
-          <span class="field__hint">Нажмите Enter или запятую для добавления</span>
+          <TagsInput
+            v-model="form.keywords"
+            placeholder="Введите и нажмите Enter..."
+          />
         </div>
 
         <div class="field">
@@ -103,58 +88,10 @@
 
       <!-- Блоки -->
       <section class="form-section">
-        <div class="form-section__header">
-          <div>
-            <h2 class="form-section__title">Блоки шаблона</h2>
-            <p class="form-section__hint">Определите, какие блоки будет редактировать пользователь</p>
-          </div>
-          <button class="add-block-btn" @click="addBlock">+ Добавить блок</button>
-        </div>
-
-        <span v-if="errors.blocks" class="field__error">{{ errors.blocks }}</span>
-
-        <div v-if="form.blocks.length === 0" class="blocks-empty">
-          Блоков пока нет — добавьте хотя бы один
-        </div>
-
-        <div v-else class="blocks-editor">
-          <div
-            v-for="(block, index) in form.blocks"
-            :key="block.id"
-            class="block-row"
-          >
-            <span class="block-row__num">{{ index + 1 }}</span>
-
-            <input
-              v-model="block.label"
-              class="field__input"
-              type="text"
-              placeholder="Название блока, например: Заголовок"
-            />
-
-            <select v-model="block.type" class="field__input block-row__type">
-              <option value="text">Текст</option>
-              <option value="image">Изображение</option>
-            </select>
-
-            <div class="block-row__btns">
-              <button
-                class="icon-btn"
-                :disabled="index === 0"
-                @click="moveBlockUp(index)"
-              >▲</button>
-              <button
-                class="icon-btn"
-                :disabled="index === form.blocks.length - 1"
-                @click="moveBlockDown(index)"
-              >▼</button>
-              <button
-                class="icon-btn icon-btn--danger"
-                @click="removeBlock(index)"
-              >✕</button>
-            </div>
-          </div>
-        </div>
+        <BlocksEditor
+          v-model="form.blocks"
+          :error="errors.blocks"
+        />
       </section>
 
       <!-- Итог -->
@@ -180,13 +117,14 @@ import { useRouter } from 'vue-router'
 import { api } from '../api'
 import { useTemplatesStore } from '../stores/templates'
 import type { Block } from '../types'
+import TagsInput from '../components/TagsInput.vue'
+import BlocksEditor from '../components/BlocksEditor.vue'
 
 const router = useRouter()
 const templatesStore = useTemplatesStore()
 
 const saving = ref(false)
 const saveError = ref<string | null>(null)
-const keywordInput = ref('')
 
 const form = reactive({
   name: '',
@@ -206,44 +144,6 @@ const errors = reactive({
   blocks: ''
 })
 
-let blockCounter = 0
-
-function addKeyword() {
-  const kw = keywordInput.value.trim().replace(/,$/, '')
-  if (kw && !form.keywords.includes(kw)) {
-    form.keywords.push(kw)
-  }
-  keywordInput.value = ''
-}
-
-function removeKeyword(kw: string) {
-  form.keywords = form.keywords.filter(k => k !== kw)
-}
-
-function addBlock() {
-  blockCounter++
-  form.blocks.push({
-    id: `new-${blockCounter}`,
-    type: 'text',
-    label: '',
-    value: ''
-  })
-}
-
-function removeBlock(index: number) {
-  form.blocks.splice(index, 1)
-}
-
-function moveBlockUp(index: number) {
-  if (index === 0) return
-  ;[form.blocks[index - 1], form.blocks[index]] = [form.blocks[index], form.blocks[index - 1]]
-}
-
-function moveBlockDown(index: number) {
-  if (index === form.blocks.length - 1) return
-  ;[form.blocks[index], form.blocks[index + 1]] = [form.blocks[index + 1], form.blocks[index]]
-}
-
 function validate(): boolean {
   errors.name = form.name.trim() ? '' : 'Введите название шаблона'
   errors.description = form.description.trim() ? '' : 'Введите описание'
@@ -254,7 +154,6 @@ function validate(): boolean {
 
 async function handleSubmit() {
   if (!validate()) return
-
   saving.value = true
   saveError.value = null
   try {
@@ -296,7 +195,7 @@ async function handleSubmit() {
   margin-bottom: 1.5rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  cursor: pointer;
   transition: opacity 0.15s;
 }
 
@@ -324,24 +223,10 @@ async function handleSubmit() {
   gap: 1.25rem;
 }
 
-.form-section__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
 .form-section__title {
   font-size: 1.1rem;
   font-weight: 700;
   color: #111827;
-}
-
-.form-section__hint {
-  font-size: 0.85rem;
-  color: #6b7280;
-  margin-top: 0.2rem;
 }
 
 .field {
@@ -406,144 +291,6 @@ async function handleSubmit() {
   color: #dc2626;
 }
 
-.field__hint {
-  font-size: 0.78rem;
-  color: #9ca3af;
-}
-
-.tags-input {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: #fff;
-  min-height: 42px;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.tags-input:focus-within {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-}
-
-.tags-input__tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: #ede9fe;
-  color: #5b21b6;
-  font-size: 0.8rem;
-  font-weight: 500;
-  padding: 0.2rem 0.6rem;
-  border-radius: 20px;
-}
-
-.tags-input__remove {
-  background: none;
-  border: none;
-  color: #7c3aed;
-  font-size: 0.7rem;
-  padding: 0;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-}
-
-.tags-input__input {
-  border: none;
-  outline: none;
-  font-size: 0.9rem;
-  flex: 1;
-  min-width: 140px;
-  color: #111827;
-}
-
-.add-block-btn {
-  background: #ede9fe;
-  color: #5b21b6;
-  border: none;
-  padding: 0.6rem 1.1rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  white-space: nowrap;
-  transition: background 0.15s;
-}
-
-.add-block-btn:hover {
-  background: #ddd6fe;
-}
-
-.blocks-empty {
-  text-align: center;
-  padding: 2rem;
-  border: 2px dashed #e5e7eb;
-  border-radius: 10px;
-  color: #9ca3af;
-  font-size: 0.9rem;
-}
-
-.blocks-editor {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.block-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.block-row__num {
-  width: 26px;
-  height: 26px;
-  background: #6366f1;
-  color: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.block-row__type {
-  width: 140px;
-  flex-shrink: 0;
-}
-
-.block-row__btns {
-  display: flex;
-  gap: 0.3rem;
-  flex-shrink: 0;
-}
-
-.icon-btn {
-  width: 30px;
-  height: 30px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  color: #374151;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s;
-}
-
-.icon-btn:hover:not(:disabled) { background: #e5e7eb; }
-.icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.icon-btn--danger:hover:not(:disabled) {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #dc2626;
-}
-
 .form-footer {
   padding: 1.5rem 1.75rem;
   display: flex;
@@ -572,6 +319,7 @@ async function handleSubmit() {
   font-size: 1rem;
   font-weight: 600;
   transition: background 0.15s, opacity 0.15s;
+  cursor: pointer;
 }
 
 .submit-btn:hover:not(:disabled) { background: #4f46e5; }
